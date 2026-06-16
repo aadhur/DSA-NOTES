@@ -1,5 +1,7 @@
 # Binary Trees
 
+Number: 10
+
 # Average of Levels in BT - 637
 
 <aside>
@@ -224,3 +226,178 @@ root=[1,2,3], target = 5 → False
     
 
 # Diameter of a BT - 543
+
+<aside>
+💡
+
+![image.png](image%209.png)
+
+root = [1,2,3,4,5] → 3 (4-2-5 or 2-1-3)
+
+NOTE: Doesn’t always need to include root
+
+</aside>
+
+- O(N)/O(N) - Iterative
+    
+    ```powershell
+    if not root:
+        return 0
+    stack = [(root, False)]
+    max_height = {}
+    diameter = 0
+    while stack:
+        node, visited = stack.pop()
+        if not visited:
+            stack.append((node, True))
+            if node.left:
+                stack.append((node.left, False))
+            if node.right:
+                stack.append((node.right, False))
+        else:
+            if node.left is None:
+                left_height = 0
+            else:
+                left_height = max_height.pop(node.left)
+            if node.right is None:
+                right_height = 0
+            else:
+                right_height = max_height.pop(node.right)
+            diameter = max(diameter, left_height + right_height)
+            max_height[node] = max(left_height, right_height)+1
+    return diameter
+    ```
+    
+- O(N)/O(N) - Recursive
+    
+    ```powershell
+    self.diameter = 0
+    def depth(root):
+        if not root:
+            return 0
+        left_depth = depth(root.left)
+        right_depth = depth(root.right)
+        self.diameter = max(self.diameter, left_depth+right_depth)
+        return 1 + max(left_depth, right_depth)
+    depth(root)
+    return self.diameter
+    
+    ```
+    
+
+# Invert BT - 226
+
+<aside>
+💡
+
+![image.png](image%2010.png)
+
+[4,2,7,1,3,6,9] → [4,7,2,9,6,3,1]
+
+</aside>
+
+- DFS stack
+    
+    ```powershell
+    if not root:
+        return None
+    stack = [root]
+    while stack:
+        curr = stack.pop()
+        if curr:
+            curr.left, curr.right = curr.right, curr.left
+            stack.extend([curr.right, curr.left])
+    return root
+    ```
+    
+- DFS recursive
+    
+    ```powershell
+    if not root:
+        return None
+    root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)
+    return root
+    ```
+    
+
+Both O(N)/O(N)
+
+# **Lowest Common Ancestor of a Binary Tree - 236**
+
+<aside>
+💡
+
+![image.png](image%2011.png)
+
+`[3,5,1,6,2,0,8,null,null,7,4]`
+
+p=5, q=1 → 3
+
+p=5, q=2 → 5
+
+</aside>
+
+- BFS queue (w/ set) O(N)/O(N)
+    
+    ```powershell
+    parent = {root:None}
+    queue = deque([root])
+    while queue:
+        node = queue.popleft() #popleft for BFS
+        if node.left:
+            queue.append(node.left)
+            parent[node.left] = node
+        if node.right:
+            queue.append(node.right)
+            parent[node.right] = node            
+        if p in parent and q in parent:
+            break
+    ancestors = set()
+    while p:
+        ancestors.add(p)
+        p = parent[p]
+    while q:
+        if q in ancestors:
+            return q
+        q = parent[q]
+    ```
+    
+- BFS queue with pointer )O(N)/O(N) but O(1) in pointer path
+    
+    ```powershell
+    parent = {root:None}
+    queue = deque([root])
+    while queue:
+        node = queue.popleft() #popleft for BFS
+        if node.left:
+            queue.append(node.left)
+            parent[node.left] = node
+        if node.right:
+            queue.append(node.right)
+            parent[node.right] = node            
+        if p in parent and q in parent:
+            break
+    pointer1, pointer2 = p, q
+    while pointer1 != pointer2:
+        pointer1 = parent[pointer1] if pointer1 else q
+        pointer2 = parent[pointer2] if pointer2 else p
+    return pointer1
+    
+    ```
+    
+- Recursive
+    
+    ```powershell
+    if root == None or p == root or q == root:
+        return root
+    left = self.lowestCommonAncestor(root.left, p,q)
+    right = self.lowestCommonAncestor(root.right,p,q)
+    if left != None and right != None:
+        return root
+    if left != None:
+        return left
+    return right
+    ```
+    
+
+NOTE: write down understanding of pointer method + recursive later
